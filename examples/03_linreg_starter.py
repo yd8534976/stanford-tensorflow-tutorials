@@ -23,7 +23,8 @@ data, n_samples = utils.read_birth_life_data(DATA_FILE)
 # Remember both X and Y are scalars with type float
 X, Y = None, None
 #############################
-########## TO DO ############
+X = tf.placeholder(tf.float32, name="X")
+Y = tf.placeholder(tf.float32, name="Y")
 #############################
 
 # Step 3: create weight and bias, initialized to 0.0
@@ -31,6 +32,8 @@ X, Y = None, None
 w, b = None, None
 #############################
 ########## TO DO ############
+w = tf.get_variable(name="weight", shape=None, initializer=tf.constant(0.0))
+b = tf.get_variable(name="bias", shape=None, initializer=tf.constant(0.0))
 #############################
 
 # Step 4: build model to predict Y
@@ -38,28 +41,38 @@ w, b = None, None
 Y_predicted = None
 #############################
 ########## TO DO ############
+Y_predicted = w * X + b
 #############################
 
 # Step 5: use the square error as the loss function
 loss = None
 #############################
 ########## TO DO ############
+loss_op = tf.square(Y - Y_predicted, name="loss")
+# def huber_loss(labels, predictions, delta=14.0):
+#     residual = tf.abs(labels - predictions)
+#     def f1(): return 0.5 * tf.square(residual)
+#     def f2(): return residual - 0.5 * tf.square(residual)
+#     return tf.cond(residual < delta, fn1=f1, fn2=f2)
+# loss_op = huber_loss(Y, Y_predicted)
 #############################
 
 # Step 6: using gradient descent with learning rate of 0.001 to minimize loss
-optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001).minimize(loss)
+optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001).minimize(loss_op)
 
 start = time.time()
 
 # Create a filewriter to write the model's graph to TensorBoard
 #############################
 ########## TO DO ############
+writer = tf.summary.FileWriter("./graph/linear_reg", tf.get_default_graph())
 #############################
 
 with tf.Session() as sess:
     # Step 7: initialize the necessary variables, in this case, w and b
     #############################
     ########## TO DO ############
+    sess.run(tf.global_variables_initializer())
     #############################
 
     # Step 8: train the model for 100 epochs
@@ -68,7 +81,7 @@ with tf.Session() as sess:
         for x, y in data:
             # Execute train_op and get the value of loss.
             # Don't forget to feed in data for placeholders
-            _, loss = ########## TO DO ############
+            _, loss = sess.run([optimizer, loss_op], feed_dict={X: x, Y: y})
             total_loss += loss
 
         print('Epoch {0}: {1}'.format(i, total_loss/n_samples))
@@ -83,12 +96,14 @@ with tf.Session() as sess:
     w_out, b_out = None, None
     #############################
     ########## TO DO ############
+    w_out = sess.run(w)
+    b_out = sess.run(b)
     #############################
 
 print('Took: %f seconds' %(time.time() - start))
 
 # uncomment the following lines to see the plot 
-# plt.plot(data[:,0], data[:,1], 'bo', label='Real data')
-# plt.plot(data[:,0], data[:,0] * w_out + b_out, 'r', label='Predicted data')
-# plt.legend()
-# plt.show()
+plt.plot(data[:,0], data[:,1], 'bo', label='Real data')
+plt.plot(data[:,0], data[:,0] * w_out + b_out, 'r', label='Predicted data')
+plt.legend()
+plt.show()

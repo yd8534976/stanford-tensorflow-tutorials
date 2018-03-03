@@ -37,6 +37,8 @@ train_data = train_data.batch(batch_size)
 test_data = None
 #############################
 ########## TO DO ############
+test_data = tf.data.Dataset.from_tensor_slices(test)
+test_data = test_data.batch(batch_size)
 #############################
 
 
@@ -56,6 +58,8 @@ test_init = iterator.make_initializer(test_data)	# initializer for train_data
 w, b = None, None
 #############################
 ########## TO DO ############
+w = tf.get_variable(name="weight", shape=(784, 10), initializer=tf.random_normal_initializer(mean=0, stddev=0.01))
+b = tf.get_variable(name="bias", shape=(1, 10), initializer=tf.zeros_initializer())
 #############################
 
 
@@ -65,6 +69,7 @@ w, b = None, None
 logits = None
 #############################
 ########## TO DO ############
+logits = tf.matmul(img, w) + b
 #############################
 
 
@@ -73,6 +78,8 @@ logits = None
 loss = None
 #############################
 ########## TO DO ############
+loss = tf.nn.softmax_cross_entropy_with_logits(labels=label, logits=logits)
+loss = tf.reduce_mean(loss)
 #############################
 
 
@@ -81,6 +88,7 @@ loss = None
 optimizer = None
 #############################
 ########## TO DO ############
+optimizer = tf.train.AdamOptimizer(learning_rate=0.01).minimize(loss)
 #############################
 
 

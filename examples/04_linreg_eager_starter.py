@@ -18,6 +18,7 @@ DATA_FILE = 'data/birth_life_2010.txt'
 # called at the very beginning of a TensorFlow program.
 #############################
 ########## TO DO ############
+tfe.enable_eager_execution()
 #############################
 
 # Read the data into a dataset.
@@ -28,29 +29,31 @@ dataset = tf.data.Dataset.from_tensor_slices((data[:,0], data[:,1]))
 #############################
 ########## TO DO ############
 #############################
-w = None
-b = None
+w = tfe.Variable(0.0)
+b = tfe.Variable(0.0)
 
 # Define the linear predictor.
 def prediction(x):
   #############################
   ########## TO DO ############
   #############################
-  pass
+  return x * w + b
 
 # Define loss functions of the form: L(y, y_predicted)
 def squared_loss(y, y_predicted):
   #############################
   ########## TO DO ############
   #############################
-  pass
+  return (y - y_predicted) ** 2
 
 def huber_loss(y, y_predicted):
   """Huber loss with `m` set to `1.0`."""
   #############################
   ########## TO DO ############
   #############################
-  pass
+  m = 1.0
+  residual = tf.abs(y - y_predicted)
+  return residual ** 2 if residual <= m else m * (2 * residual - m)
 
 def train(loss_fn):
   """Train a regression model evaluated using `loss_fn`."""
@@ -62,13 +65,13 @@ def train(loss_fn):
   ########## TO DO ############
   #############################
   def loss_for_example(x, y):
-    pass
+    return loss_fn(y, prediction(x))
 
   # Obtain a gradients function using `tfe.implicit_value_and_gradients`.
   #############################
   ########## TO DO ############
   #############################
-  grad_fn = None
+  grad_fn = tfe.implicit_value_and_gradients(loss_for_example)
 
   start = time.time()
   for epoch in range(100):
@@ -77,6 +80,7 @@ def train(loss_fn):
       # Compute the loss and gradient, and take an optimization step.
       #############################
       ########## TO DO ############
+      loss, gradients = grad_fn(x_i, y_i)
       #############################
       optimizer.apply_gradients(gradients)
       total_loss += loss
